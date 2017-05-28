@@ -1,0 +1,36 @@
+<html>
+
+<head></head>
+
+<body ng-app="app" ng-controller="TestController">
+
+  <label>config:</label>
+  <pre>
+{{test | json}}
+  </pre>
+
+  <script src="scripts/angular.min.js"></script>
+  <script src="scripts/of-config.js"></script>
+  <script>
+    angular.module("app", ["of.config"]);
+
+    angular.module("app").config(["OfConfigServiceProvider", function($configProvider) {
+      $configProvider.configure("/settings.json");
+    }]);
+
+    angular.module("app").run(["OfConfigService", function($config) {
+      // load again
+      // $config.load().then(function(res) {
+      //   console.debug("config cargada", res);
+      // });
+    }]);
+
+    angular.module("app").controller("TestController", ["$scope", "OfConfigService", function($scope, $config) {
+      console.debug("config en scope", angular.extend({}, $config.settings));
+      $scope.test = $config.settings;
+    }]);
+  </script>
+
+</body>
+
+</html>
