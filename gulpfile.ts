@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * Packages.
+ * Constantes de paquetes npm
  */
 const gulp = require("gulp");
 const del = require("del");
@@ -12,10 +12,9 @@ const tsc = require("gulp-typescript");
 const tslint = require("gulp-tslint");
 const runSequence = require("run-sequence");
 const browserSync = require("browser-sync");
-const reload = browserSync.reload;
 
 /**
- * Configuration.
+ * Constantes de control y configuración
  */
 const DIST_DIR = "dist";
 
@@ -23,14 +22,15 @@ const TMP_DIR = ".tmp";
 const TMP_SCRIPTS_DIR = ".tmp/scripts";
 
 const tsProject = tsc.createProject("tsconfig.json");
+const reload = browserSync.reload;
 
 /**
- * Clean task.
+ * Tarea que limpia directorios
  */
 gulp.task("clean", (x) => del([DIST_DIR, TMP_DIR], x));
 
 /**
- * Lint ts.
+ * Tarea que analiza typescript
  */
 gulp.task("lint", () => {
   return gulp.src("app/**/**.ts")
@@ -39,7 +39,7 @@ gulp.task("lint", () => {
 });
 
 /**
- * Compile task for ts.
+ * Tarea que compila typescript a javascript y genera los tipos typescript
  */
 gulp.task("compile", ["lint"], () => {
   // source files
@@ -65,7 +65,7 @@ gulp.task("compile", ["lint"], () => {
 });
 
 /**
- * Content task.
+ * Tarea que copia todo el contenido que no necesita procesamiento al directorio de ejecución
  */
 gulp.task("content", () => {
   return gulp.src([
@@ -78,7 +78,7 @@ gulp.task("content", () => {
 });
 
 /**
- * Libs task.
+ * Tarea que copia las librerías al directorio de scripts de ejecución
  */
 gulp.task("libs", () => {
   return gulp.src([
@@ -86,19 +86,18 @@ gulp.task("libs", () => {
     "node_modules/angular-translate/dist/angular-translate.min.js",
     "node_modules/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js",
   ], { nodir: true })
-    .pipe(gulp.dest(TMP_SCRIPTS_DIR))
-    .pipe(gulp.dest(DIST_DIR));
+    .pipe(gulp.dest(TMP_SCRIPTS_DIR));
 });
 
 /**
- * Build task.
+ * Tarea que construye el paquete a distribuir
  */
 gulp.task("build", (callback) => {
   runSequence("clean", ["compile", "content", "libs"], callback);
 });
 
 /**
- * Watch task.
+ * Tarea para servir el código de pruebas
  */
 gulp.task("serve", ["compile", "content", "libs"], () => {
   browserSync({
