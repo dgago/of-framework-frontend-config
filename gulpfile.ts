@@ -18,7 +18,6 @@ const reload = browserSync.reload;
  * Configuration.
  */
 const DIST_DIR = "dist";
-const DIST_SCRIPTS_DIR = "dist/scripts";
 
 const TMP_DIR = ".tmp";
 const TMP_SCRIPTS_DIR = ".tmp/scripts";
@@ -47,8 +46,7 @@ gulp.task("compile", ["lint"], () => {
   let tsResult = gulp.src([
     "app/**/!(init)*.ts",
     "app/init.ts",
-  ])
-    .pipe(tsProject());
+  ]).pipe(tsProject());
 
   // tipos typescript
   tsResult.dts
@@ -70,10 +68,11 @@ gulp.task("compile", ["lint"], () => {
  * Content task.
  */
 gulp.task("content", () => {
-  return gulp.src(["app/**/*",
+  return gulp.src([
+    "app/**/*",
+    "!**/*.html",
     "!**/*.ts",
     "!**/*.scss",
-    "!app/images/*",
   ], { nodir: true })
     .pipe(gulp.dest(TMP_DIR));
 });
@@ -84,8 +83,11 @@ gulp.task("content", () => {
 gulp.task("libs", () => {
   return gulp.src([
     "node_modules/angular/angular.min.js",
+    "node_modules/angular-translate/dist/angular-translate.min.js",
+    "node_modules/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js",
   ], { nodir: true })
-    .pipe(gulp.dest(TMP_SCRIPTS_DIR));
+    .pipe(gulp.dest(TMP_SCRIPTS_DIR))
+    .pipe(gulp.dest(DIST_DIR));
 });
 
 /**
@@ -98,12 +100,12 @@ gulp.task("build", (callback) => {
 /**
  * Watch task.
  */
-gulp.task("serve", ["compile"], () => {
+gulp.task("serve", ["compile", "content", "libs"], () => {
   browserSync({
     // Customize the Browsersync console logging prefix
     logPrefix: "OFK",
     notify: false,
-    port: 3000,
+    port: 3001,
     // Allow scroll syncing across breakpoints
     // scrollElementMapping: ["main", ".mdl-layout"],
     // Run as an https by uncommenting "https: true"

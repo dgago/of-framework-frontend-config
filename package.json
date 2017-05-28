@@ -1,6 +1,6 @@
 {
   "name": "of-framework-frontend-config",
-  "version": "0.1.0-alpha",
+  "version": "0.2.0",
   "description": "Módulo de configuración para front end.",
   "main": "index.html",
   "scripts": {
@@ -21,6 +21,7 @@
   "homepage": "https://bitbucket.org/dgago/of-framework-frontend-config#readme",
   "devDependencies": {
     "@types/angular": "^1.6.17",
+    "@types/angular-translate": "^2.15.0",
     "@types/node": "^7.0.22",
     "browser-sync": "^2.18.12",
     "del": "^2.2.2",
@@ -35,6 +36,8 @@
     "typescript": "^2.3.2"
   },
   "dependencies": {
-    "angular": "^1.6.4"
+    "angular": "^1.6.4",
+    "angular-translate": "^2.15.1",
+    "angular-translate-loader-static-files": "^2.15.1"
   }
 }

@@ -9,13 +9,28 @@
 {{test | json}}
   </pre>
 
+  <label>language:</label>
+  <pre>
+{{language | json}}
+  </pre>
+
+  <button ng-click="useLang('en')">EN</button>
+  <button ng-click="useLang('es')">ES</button>
+
+  <p translate="HELLO"></p>
+
   <script src="scripts/angular.min.js"></script>
+  <script src="scripts/angular-translate.min.js"></script>
+  <script src="scripts/angular-translate-loader-static-files.min.js"></script>
   <script src="scripts/of-config.js"></script>
   <script>
     angular.module("app", ["of.config"]);
 
     angular.module("app").config(["OfConfigServiceProvider", function($configProvider) {
-      $configProvider.configure("/settings.json");
+      $configProvider.configureSettings("/settings.json");
+      var lang = new LanguageSettings();
+      lang.storage = new OfLocalStorageService();
+      $configProvider.configureLanguage(lang);
     }]);
 
     angular.module("app").run(["OfConfigService", function($config) {
@@ -26,8 +41,12 @@
     }]);
 
     angular.module("app").controller("TestController", ["$scope", "OfConfigService", function($scope, $config) {
-      console.debug("config en scope", angular.extend({}, $config.settings));
       $scope.test = $config.settings;
+      $scope.language = $config.language;
+
+      $scope.useLang = function(lang) {
+        $config.setLanguage(lang);
+      }
     }]);
   </script>
 

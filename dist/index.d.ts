@@ -4,31 +4,66 @@ interface IKeyValue {
 }
 
 /// <reference types="angular" />
+/// <reference types="angular-translate" />
 /**
- * Interface del servicio.
+ * Interface del servicio
  */
 interface IOfConfigService {
     settings: any;
-    load(): ng.IHttpPromise<any>;
+    loadSettings(): ng.IHttpPromise<any>;
+    loadLanguage(): any;
+    getLanguage(): string;
+    setLanguage(lang: string): any;
 }
 /**
- * Implementación del servicio.
+ * Implementación del servicio
  */
 declare class OfConfigService implements IOfConfigService {
-    private settingsEndpoint;
     private $http;
     private $log;
+    private $translate;
+    private settingsEndpoint;
+    private language;
     settings: any;
-    constructor(settingsEndpoint: string, $http: ng.IHttpService, $log: ng.ILogService);
-    load(): ng.IHttpPromise<any>;
+    constructor($http: ng.IHttpService, $log: ng.ILogService, $translate: ng.translate.ITranslateService, settingsEndpoint: string, language: LanguageSettings);
+    /**
+     * Carga la configuración desde el endpoint designado
+     */
+    loadSettings(): ng.IHttpPromise<any>;
+    /**
+     * Inicialización del lenguaje a utilizar en la aplicación
+     */
+    loadLanguage(): void;
+    /**
+     * Devuelve el lenguaje que se está utilizando en la aplicación
+     */
+    getLanguage(): string;
+    /**
+     * Establece el lenguaje a utilizar en la aplicación
+     * @param lang Lenguaje a establecer
+     */
+    setLanguage(lang: string): void;
 }
 /**
- * Proveedor del servicio.
+ * Proveedor del servicio
  */
 declare class OfConfigServiceProvider implements ng.IServiceProvider {
-    $get: (string | (($http: angular.IHttpService, $log: angular.ILogService) => IOfConfigService))[];
+    private $translateProvider;
+    static $inject: ReadonlyArray<string>;
+    $get: (string | (($http: angular.IHttpService, $log: angular.ILogService, $translate: angular.translate.ITranslateService) => IOfConfigService))[];
     private settingsEndpoint;
-    configure(settingsEndpoint: string): void;
+    private languageSettings;
+    constructor($translateProvider: ng.translate.ITranslateProvider);
+    configureSettings(settingsEndpoint: string): void;
+    configureLanguage(languageSettings: LanguageSettings): void;
+}
+
+declare class LanguageSettings {
+    localizationPrefix: string;
+    localizationSuffix: string;
+    storageKey: string;
+    storage: IBrowserStorage;
+    lang: string;
 }
 
 
