@@ -1,26 +1,26 @@
 /// <reference types="angular" />
+/// <reference types="angular-translate" />
 
 "use strict";
 
 ((angularJs: ng.IAngularStatic) => {
 
   console.debug("of.config - inicializando módulo");
-  angularJs.module("of.config", []);
+  angularJs.module("of.config", [
+    "pascalprecht.translate",
+  ]);
 
   /**
-   * Services.
+   * Services
    */
   angularJs.module("of.config")
     .service("OfHttpService", OfHttpService);
-
-  // angularJs.module("of.config")
-  //   .service("OfApiHttpService", OfApiHttpService);
 
   angularJs.module("of.config")
     .service("OfStorageService", OfLocalStorageService);
 
   /**
-   * Providers.
+   * Providers
    */
   angularJs.module("of.config")
     .provider("OfConfigService", OfConfigServiceProvider);

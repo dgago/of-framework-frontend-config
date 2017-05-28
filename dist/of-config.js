@@ -1,16 +1,22 @@
 
 /**
- * Implementación del servicio.
+ * Implementación del servicio
  */
 var OfConfigService = (function () {
-    function OfConfigService(settingsEndpoint, $http, $log) {
-        this.settingsEndpoint = settingsEndpoint;
+    function OfConfigService($http, $log, $translate, settingsEndpoint, language) {
         this.$http = $http;
         this.$log = $log;
+        this.$translate = $translate;
+        this.settingsEndpoint = settingsEndpoint;
+        this.language = language;
         this.settings = {};
-        this.load();
+        this.loadSettings();
+        this.loadLanguage();
     }
-    OfConfigService.prototype.load = function () {
+    /**
+     * Carga la configuración desde el endpoint designado
+     */
+    OfConfigService.prototype.loadSettings = function () {
         var _this = this;
         this.$log.debug("of.config - cargando configuración");
         if (!this.settingsEndpoint) {
@@ -25,30 +31,86 @@ var OfConfigService = (function () {
         });
         return pr;
     };
+    /**
+     * Inicialización del lenguaje a utilizar en la aplicación
+     */
+    OfConfigService.prototype.loadLanguage = function () {
+        this.$log.debug("of.config - cargando lenguage");
+        if (this.language) {
+            this.setLanguage(this.getLanguage());
+            this.$log.debug("of.config - lenguaje cargado", this.language);
+        }
+        else {
+            this.$log.info("of.config - no se especifica configuración para lenguaje");
+        }
+    };
+    /**
+     * Devuelve el lenguaje que se está utilizando en la aplicación
+     */
+    OfConfigService.prototype.getLanguage = function () {
+        var lang = this.language.storage.getItem(this.language.storageKey) || this.language.lang;
+        return lang;
+    };
+    /**
+     * Establece el lenguaje a utilizar en la aplicación
+     * @param lang Lenguaje a establecer
+     */
+    OfConfigService.prototype.setLanguage = function (lang) {
+        this.language.lang = lang;
+        this.language.storage.setItem(this.language.storageKey, lang);
+        this.$translate.use(lang);
+    };
     return OfConfigService;
 }());
 /**
- * Proveedor del servicio.
+ * Proveedor del servicio
  */
 var OfConfigServiceProvider = (function () {
-    function OfConfigServiceProvider() {
+    function OfConfigServiceProvider($translateProvider) {
         var _this = this;
-        // Devuelve una instancia del servicio.
+        this.$translateProvider = $translateProvider;
+        // Devuelve una instancia del servicio
         this.$get = [
             "$http",
             "$log",
-            function ($http, $log) {
-                var instance = new OfConfigService(_this.settingsEndpoint, $http, $log);
+            "$translate",
+            function ($http, $log, $translate) {
+                var instance = new OfConfigService($http, $log, $translate, _this.settingsEndpoint, _this.languageSettings);
                 return instance;
             }
         ];
     }
-    // Configuración del servicio.
-    OfConfigServiceProvider.prototype.configure = function (settingsEndpoint) {
-        console.debug("of.config - configurando proveedor");
+    // Configuración del servicio
+    OfConfigServiceProvider.prototype.configureSettings = function (settingsEndpoint) {
+        console.debug("of.config - configurando settings", settingsEndpoint);
         this.settingsEndpoint = settingsEndpoint;
     };
+    OfConfigServiceProvider.prototype.configureLanguage = function (languageSettings) {
+        console.debug("of.config - configurando lenguaje", languageSettings);
+        this.languageSettings = languageSettings;
+        this.$translateProvider.useStaticFilesLoader({
+            prefix: languageSettings.localizationPrefix,
+            suffix: languageSettings.localizationSuffix,
+        });
+        this.$translateProvider.useSanitizeValueStrategy("escape");
+        // Establecimiento del lenguaje por defecto
+        if (!languageSettings.lang) {
+            languageSettings.lang = (navigator.language || navigator.userLanguage).split("-")[0];
+        }
+        this.$translateProvider.preferredLanguage(languageSettings.lang);
+    };
     return OfConfigServiceProvider;
+}());
+OfConfigServiceProvider.$inject = ["$translateProvider"];
+
+var LanguageSettings = (function () {
+    function LanguageSettings() {
+        this.localizationPrefix = "localization/";
+        this.localizationSuffix = ".json";
+        this.storageKey = "language";
+        this.lang = undefined;
+    }
+    return LanguageSettings;
 }());
 
 /*class OfApiHttpService<T> extends OfHttpService {
@@ -205,21 +267,22 @@ var OfSessionStorageService = (function () {
 }());
 
 /// <reference types="angular" />
+/// <reference types="angular-translate" />
 "use strict";
 (function (angularJs) {
     console.debug("of.config - inicializando módulo");
-    angularJs.module("of.config", []);
+    angularJs.module("of.config", [
+        "pascalprecht.translate",
+    ]);
     /**
-     * Services.
+     * Services
      */
     angularJs.module("of.config")
         .service("OfHttpService", OfHttpService);
-    // angularJs.module("of.config")
-    //   .service("OfApiHttpService", OfApiHttpService);
     angularJs.module("of.config")
         .service("OfStorageService", OfLocalStorageService);
     /**
-     * Providers.
+     * Providers
      */
     angularJs.module("of.config")
         .provider("OfConfigService", OfConfigServiceProvider);
