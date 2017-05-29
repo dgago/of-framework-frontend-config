@@ -1,6 +1,55 @@
+/// <reference types="angular" />
+declare class AppState {
+    abstract: boolean;
+    controller: string | ng.IController;
+    data: any;
+    name: string;
+    parent: string;
+    templateUrl: string;
+    url: string;
+}
+
 interface IKeyValue {
     id: string;
     value: any;
+}
+
+declare class LanguageSettings {
+    localizationPrefix: string;
+    localizationSuffix: string;
+    storageKey: string;
+    storage: IBrowserStorage;
+    lang: string;
+}
+
+declare type StateSettingsCallback = (states: Array<UiOption | UiGroup>) => void;
+declare class StateSettings {
+    statesEndpoint: string;
+    callback: StateSettingsCallback;
+}
+
+declare class UiGroup {
+    icon: string;
+    label: string;
+    tooltip: string;
+    options: UiOption[];
+}
+
+/// <reference types="angular" />
+declare type UiOptionAction = (ev: ng.IAngularEvent, state: AppState) => void;
+declare class UiOption extends AppState {
+    type: MenuOptionType;
+    icon: string;
+    label: string;
+    tooltip: string;
+    cssClass: string;
+    action: string | UiOptionAction;
+    auth: any;
+}
+declare enum MenuOptionType {
+    Action = 1,
+    Url = 2,
+    State = 3,
 }
 
 /// <reference types="angular" />
@@ -10,8 +59,10 @@ interface IKeyValue {
  */
 interface IOfConfigService {
     settings: any;
+    states: Array<UiGroup | UiOption>;
     loadSettings(): ng.IHttpPromise<any>;
-    loadLanguage(): any;
+    loadLanguage(): void;
+    loadStates(): ng.IHttpPromise<any>;
     getLanguage(): string;
     setLanguage(lang: string): any;
 }
@@ -23,9 +74,26 @@ declare class OfConfigService implements IOfConfigService {
     private $log;
     private $translate;
     private settingsEndpoint;
-    private language;
+    private stateSettings;
+    private languageSettings;
+    /**
+     * Settings de la app
+     */
     settings: any;
-    constructor($http: ng.IHttpService, $log: ng.ILogService, $translate: ng.translate.ITranslateService, settingsEndpoint: string, language: LanguageSettings);
+    /**
+     * Estados de la app
+     */
+    states: Array<UiGroup | UiOption>;
+    /**
+     * Constructor del servicio
+     * @param http Servicio http
+     * @param log Servicio de log
+     * @param translate Servicio multilenguaje
+     * @param settingsEndpoint Endpoint desde donde se cargan las settings de la app
+     * @param stateSettings Parámetros de configuración para obtener los estados de la app
+     * @param languageSettings Parámetros de configuración de multilenguaje
+     */
+    constructor($http: ng.IHttpService, $log: ng.ILogService, $translate: ng.translate.ITranslateService, settingsEndpoint: string, stateSettings: StateSettings, languageSettings: LanguageSettings);
     /**
      * Carga la configuración desde el endpoint designado
      */
@@ -34,6 +102,10 @@ declare class OfConfigService implements IOfConfigService {
      * Inicialización del lenguaje a utilizar en la aplicación
      */
     loadLanguage(): void;
+    /**
+     * Carga los estados de la app
+     */
+    loadStates(): ng.IHttpPromise<Array<UiGroup | UiOption>>;
     /**
      * Devuelve el lenguaje que se está utilizando en la aplicación
      */
@@ -44,28 +116,55 @@ declare class OfConfigService implements IOfConfigService {
      */
     setLanguage(lang: string): void;
 }
+
+/// <reference types="angular" />
+/// <reference types="angular-translate" />
 /**
- * Proveedor del servicio
+ * Proveedor del servicio de configuración
  */
 declare class OfConfigServiceProvider implements ng.IServiceProvider {
     private $translateProvider;
+    /**
+     * Inyección de dependencias del proveedor
+     */
     static $inject: ReadonlyArray<string>;
+    /**
+     * Devuelve una instancia del servicio
+     */
     $get: (string | (($http: angular.IHttpService, $log: angular.ILogService, $translate: angular.translate.ITranslateService) => IOfConfigService))[];
+    /**
+     * Endpoint desde donde se cargan las settings
+     */
     private settingsEndpoint;
+    /**
+     * Parámetros de configuración para obtener los estados de la app
+     */
+    private stateSettings;
+    /**
+     * Parámetros de configuración de multilenguaje
+     */
     private languageSettings;
+    /**
+     * Constructor del proveedor
+     * @param translateProvider Proveedor de configuración de multilenguaje
+     */
     constructor($translateProvider: ng.translate.ITranslateProvider);
+    /**
+     * Configuración de las settings
+     * @param settingsEndpoint Endpoint desde donde se cargan las settings
+     */
     configureSettings(settingsEndpoint: string): void;
+    /**
+     * Configuración de multilenguaje
+     * @param languageSettings Parámetros de configuración de multilenguaje
+     */
     configureLanguage(languageSettings: LanguageSettings): void;
+    /**
+     * Configuración de los estados de la app
+     * @param stateSettings Parámetros de configuración para obtener los estados de la app
+     */
+    configureStates(stateSettings: StateSettings): void;
 }
-
-declare class LanguageSettings {
-    localizationPrefix: string;
-    localizationSuffix: string;
-    storageKey: string;
-    storage: IBrowserStorage;
-    lang: string;
-}
-
 
 /// <reference types="angular" />
 /**

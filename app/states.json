@@ -1,0 +1,20 @@
+[
+  {
+    "abstract": true,
+    "name": "root",
+    "templateUrl": "/pages/root.html"
+  },
+  {
+    "name": "home",
+    "parent": "root",
+    "templateUrl": "/pages/home.html",
+    "url": "/home",
+    "data": {
+      "prop1": "value1"
+    },
+    "type": "State",
+    "icon": "description",
+    "label": "Home page",
+    "tooltip": "Go to the home page"
+  }
+]
