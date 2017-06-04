@@ -43,7 +43,7 @@ gulp.task("lint", () => {
  */
 gulp.task("compile", ["lint"], () => {
   // source files
-  let tsResult = gulp.src([
+  const tsResult = gulp.src([
     "app/**/!(init)*.ts",
     "app/init.ts",
   ]).pipe(tsProject());
