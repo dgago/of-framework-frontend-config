@@ -1,17 +1,96 @@
+var AppState = (function () {
+    function AppState() {
+    }
+    return AppState;
+}());
+
+
+var LanguageSettings = (function () {
+    function LanguageSettings() {
+        this.localizationPrefix = "localization/";
+        this.localizationSuffix = ".json";
+        this.storageKey = "language";
+        this.lang = undefined;
+    }
+    return LanguageSettings;
+}());
+
+var StateSettings = (function () {
+    function StateSettings() {
+    }
+    return StateSettings;
+}());
+
+var UiGroup = (function () {
+    function UiGroup() {
+    }
+    return UiGroup;
+}());
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var UiOption = (function (_super) {
+    __extends(UiOption, _super);
+    function UiOption() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return UiOption;
+}(AppState));
+var MenuOptionType;
+(function (MenuOptionType) {
+    MenuOptionType[MenuOptionType["Action"] = 1] = "Action";
+    MenuOptionType[MenuOptionType["Url"] = 2] = "Url";
+    MenuOptionType[MenuOptionType["State"] = 3] = "State";
+})(MenuOptionType || (MenuOptionType = {}));
 
 /**
  * Implementación del servicio
  */
 var OfConfigService = (function () {
-    function OfConfigService($http, $log, $translate, settingsEndpoint, language) {
+    /**
+     * Constructor del servicio
+     * @param http Servicio http
+     * @param log Servicio de log
+     * @param translate Servicio multilenguaje
+     * @param settingsEndpoint Endpoint desde donde se cargan las settings de la app
+     * @param stateSettings Parámetros de configuración para obtener los estados de la app
+     * @param languageSettings Parámetros de configuración de multilenguaje
+     */
+    function OfConfigService($http, $log, $translate, settingsEndpoint, stateSettings, languageSettings) {
+        var _this = this;
         this.$http = $http;
         this.$log = $log;
         this.$translate = $translate;
         this.settingsEndpoint = settingsEndpoint;
-        this.language = language;
+        this.stateSettings = stateSettings;
+        this.languageSettings = languageSettings;
+        /**
+         * Settings de la app
+         */
         this.settings = {};
-        this.loadSettings();
-        this.loadLanguage();
+        /**
+         * Estados de la app
+         */
+        this.states = [];
+        console.debug("logger", $log);
+        this.loadSettings()
+            .then(function (res) {
+            return _this.loadStates();
+        })
+            .then(function (res) {
+            return _this.loadLanguage();
+        })
+            .catch(function (err) {
+            $log.error(err);
+        });
     }
     /**
      * Carga la configuración desde el endpoint designado
@@ -36,19 +115,41 @@ var OfConfigService = (function () {
      */
     OfConfigService.prototype.loadLanguage = function () {
         this.$log.debug("of.config - cargando lenguage");
-        if (this.language) {
+        if (this.languageSettings) {
             this.setLanguage(this.getLanguage());
-            this.$log.debug("of.config - lenguaje cargado", this.language);
+            this.$log.debug("of.config - lenguaje cargado", this.languageSettings);
         }
         else {
             this.$log.info("of.config - no se especifica configuración para lenguaje");
         }
     };
     /**
+     * Carga los estados de la app
+     */
+    OfConfigService.prototype.loadStates = function () {
+        var _this = this;
+        console.debug("logger", this.$log);
+        this.$log.debug("of.config - cargando estados");
+        if (!this.stateSettings) {
+            this.$log.info("of.config - no se especifica endpoint para estados");
+            return null;
+        }
+        var pr = this.$http.get(this.stateSettings.statesEndpoint);
+        pr.then(function (res) {
+            _this.$log.debug("of.config - estados cargados", res.data);
+            _this.states = angular.extend(_this.states, res.data);
+            if (_this.stateSettings.callback) {
+                _this.stateSettings.callback(res.data);
+            }
+            return res.data;
+        });
+        return pr;
+    };
+    /**
      * Devuelve el lenguaje que se está utilizando en la aplicación
      */
     OfConfigService.prototype.getLanguage = function () {
-        var lang = this.language.storage.getItem(this.language.storageKey) || this.language.lang;
+        var lang = this.languageSettings.storage.getItem(this.languageSettings.storageKey) || this.languageSettings.lang;
         return lang;
     };
     /**
@@ -56,35 +157,50 @@ var OfConfigService = (function () {
      * @param lang Lenguaje a establecer
      */
     OfConfigService.prototype.setLanguage = function (lang) {
-        this.language.lang = lang;
-        this.language.storage.setItem(this.language.storageKey, lang);
+        this.languageSettings.lang = lang;
+        this.languageSettings.storage.setItem(this.languageSettings.storageKey, lang);
         this.$translate.use(lang);
     };
     return OfConfigService;
 }());
+
 /**
- * Proveedor del servicio
+ * Proveedor del servicio de configuración
  */
 var OfConfigServiceProvider = (function () {
+    /**
+     * Constructor del proveedor
+     * @param translateProvider Proveedor de configuración de multilenguaje
+     */
     function OfConfigServiceProvider($translateProvider) {
         var _this = this;
         this.$translateProvider = $translateProvider;
-        // Devuelve una instancia del servicio
+        /**
+         * Devuelve una instancia del servicio
+         */
         this.$get = [
             "$http",
             "$log",
             "$translate",
             function ($http, $log, $translate) {
-                var instance = new OfConfigService($http, $log, $translate, _this.settingsEndpoint, _this.languageSettings);
+                console.debug("logger", $log);
+                var instance = new OfConfigService($http, $log, $translate, _this.settingsEndpoint, _this.stateSettings, _this.languageSettings);
                 return instance;
             }
         ];
     }
-    // Configuración del servicio
+    /**
+     * Configuración de las settings
+     * @param settingsEndpoint Endpoint desde donde se cargan las settings
+     */
     OfConfigServiceProvider.prototype.configureSettings = function (settingsEndpoint) {
         console.debug("of.config - configurando settings", settingsEndpoint);
         this.settingsEndpoint = settingsEndpoint;
     };
+    /**
+     * Configuración de multilenguaje
+     * @param languageSettings Parámetros de configuración de multilenguaje
+     */
     OfConfigServiceProvider.prototype.configureLanguage = function (languageSettings) {
         console.debug("of.config - configurando lenguaje", languageSettings);
         this.languageSettings = languageSettings;
@@ -99,44 +215,20 @@ var OfConfigServiceProvider = (function () {
         }
         this.$translateProvider.preferredLanguage(languageSettings.lang);
     };
+    /**
+     * Configuración de los estados de la app
+     * @param stateSettings Parámetros de configuración para obtener los estados de la app
+     */
+    OfConfigServiceProvider.prototype.configureStates = function (stateSettings) {
+        console.debug("of.config - configurando estados", stateSettings);
+        this.stateSettings = stateSettings;
+    };
     return OfConfigServiceProvider;
 }());
+/**
+ * Inyección de dependencias del proveedor
+ */
 OfConfigServiceProvider.$inject = ["$translateProvider"];
-
-var LanguageSettings = (function () {
-    function LanguageSettings() {
-        this.localizationPrefix = "localization/";
-        this.localizationSuffix = ".json";
-        this.storageKey = "language";
-        this.lang = undefined;
-    }
-    return LanguageSettings;
-}());
-
-/*class OfApiHttpService<T> extends OfHttpService {
-  protected baseEndpoint: string;
-
-  public get(args: any, config?: ng.IRequestShortcutConfig): ng.IHttpPromise<T[]> {
-    return this.Http.get(this.baseEndpoint + "?" + this.HttpParamSerializer(args), config);
-  }
-
-  public getOne(id: string, config?: ng.IRequestShortcutConfig): ng.IHttpPromise<T> {
-    return this.Http.get(this.baseEndpoint + id, config);
-  }
-
-  public post(args: T, config?: ng.IRequestShortcutConfig): ng.IHttpPromise<T> {
-    return this.Http.post(this.baseEndpoint, args, config);
-  }
-
-  public put(id: string, args: T, config?: ng.IRequestShortcutConfig): ng.IHttpPromise<{}> {
-    return this.Http.put(this.baseEndpoint + id, args, config);
-  }
-
-  public delete(id: string, config?: ng.IRequestShortcutConfig): ng.IHttpPromise<{}> {
-    return this.Http.delete(this.baseEndpoint + id, config);
-  }
-}
-*/
 
 /**
  * Servicio base para acceso HTTP.

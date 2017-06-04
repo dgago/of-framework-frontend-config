@@ -31,6 +31,11 @@
       var lang = new LanguageSettings();
       lang.storage = new OfLocalStorageService();
       $configProvider.configureLanguage(lang);
+
+      var stateSettings = new StateSettings();
+      stateSettings.statesEndpoint = "/states.json";
+      stateSettings.callback = function(state) { console.debug("estados cargados b", state); };
+      $configProvider.configureStates(stateSettings);
     }]);
 
     angular.module("app").run(["OfConfigService", function($config) {
