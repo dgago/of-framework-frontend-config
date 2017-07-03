@@ -1,5 +1,6 @@
 /// <reference types="angular" />
 /// <reference types="angular-translate" />
+/// <reference types="angular-ui-router" />
 
 "use strict";
 
@@ -7,10 +8,32 @@
 
   const MODULE: string = "of.config";
 
-  console.debug("of.config - inicializando módulo");
   angularJs.module(MODULE, [
     "pascalprecht.translate",
+    "ui.router",
   ]);
+
+  /**
+   * Etapa de configuración.
+   */
+  angularJs.module(MODULE)
+    .config([
+      "$urlRouterProvider",
+      "OfConfigServiceProvider",
+      configure,
+    ]);
+
+  /**
+   * Etapa de ejecución.
+   */
+  angularJs.module(MODULE)
+    .run([
+      "$log",
+      "$urlRouter",
+      "$uiRouter",
+      "OfConfigService",
+      run,
+    ]);
 
   /**
    * Services
@@ -26,5 +49,67 @@
    */
   angularJs.module(MODULE)
     .provider("OfConfigService", OfConfigServiceProvider);
+
+  /////////////////////////////////////////////////////////////////////////////
+
+  let statesObserver: StatesEndpointCallback;
+
+  function configure(
+    urlRouterProvider: ng.ui.IUrlRouterProvider,
+    configServiceProvider: OfConfigServiceProvider,
+  ) {
+    // Ruteo de vistas
+    urlRouterProvider.deferIntercept();
+    urlRouterProvider.otherwise("/home");
+
+    // Observer para la carga de estados
+    configServiceProvider.statesObservers.push((states: Array<UiOption | UiGroup>) => {
+      if (statesObserver) {
+        statesObserver(states);
+      }
+    });
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+
+  function run(
+    logService: ng.ILogService,
+    urlRouterService: ng.ui.IUrlRouterService,
+    uiRouterService: any,
+    configService: IOfConfigService,
+  ) {
+    statesObserver = loadStates;
+
+    function loadStates(states: Array<UiOption | UiGroup>) {
+      // Los estados funcionan como opciones de menú.
+      // configService.settings.options = states;
+
+      // Se definen estados del router a partir de los leídos desde el endpoint.
+      states.forEach((item: UiOption | UiGroup) => {
+        const op: UiOption = item as UiOption;
+
+        const statedef = {
+          abstract: op.abstract,
+          controller: op.controller || DefaultController,
+          data: op.data,
+          name: op.name,
+          parent: op.parent,
+          templateUrl: configService.settings.pagesPath + op.templateUrl,
+          url: op.url,
+        };
+
+        try {
+          uiRouterService.stateRegistry.register(statedef);
+        } catch (e) {
+          logService.error(MODULE + " - error registrando estado", op);
+          throw e;
+        }
+      });
+
+      // Configura el UrlRouter para escuchar.
+      urlRouterService.sync();
+      urlRouterService.listen();
+    }
+  }
 
 })((window as any).angular);

@@ -275,3 +275,28 @@ declare class OfSessionStorageService {
     removeItem(key: string): void;
 }
 
+/// <reference types="angular" />
+declare class Component implements ng.IComponentOptions {
+    bindings: {
+        [boundProperty: string]: string;
+    };
+    templateUrl: string | ng.Injectable<(...args: any[]) => string>;
+    transclude: boolean | {
+        [slot: string]: string;
+    };
+    controller: string | ng.Injectable<ng.IControllerConstructor>;
+}
+declare class ComponentController implements ng.IController {
+    protected ui: any;
+}
+
+/// <reference types="angular" />
+/// <reference types="angular-ui-router" />
+declare class DefaultController implements ng.IController {
+    protected $scope: ng.IScope;
+    protected $state: ng.ui.IStateService;
+    protected $config: IOfConfigService;
+    static $inject: ReadonlyArray<string>;
+    constructor($scope: ng.IScope, $state: ng.ui.IStateService, $config: IOfConfigService);
+}
+

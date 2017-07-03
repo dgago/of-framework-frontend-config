@@ -82,9 +82,15 @@ gulp.task("content", () => {
  */
 gulp.task("libs", () => {
   return gulp.src([
+    // angular deps
     "node_modules/angular/angular.min.js",
+
+    // translate deps
     "node_modules/angular-translate/dist/angular-translate.min.js",
     "node_modules/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js",
+
+    // routing deps
+    "node_modules/@uirouter/angularjs/release/angular-ui-router.min.js",
   ], { nodir: true })
     .pipe(gulp.dest(TMP_SCRIPTS_DIR));
 });
