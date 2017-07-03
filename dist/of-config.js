@@ -399,14 +399,61 @@ var OfSessionStorageService = (function () {
     return OfSessionStorageService;
 }());
 
+var Component = (function () {
+    function Component() {
+        this.bindings = {};
+        this.transclude = false;
+    }
+    return Component;
+}());
+var ComponentController = (function () {
+    function ComponentController() {
+        this.ui = {};
+    }
+    return ComponentController;
+}());
+
+var DefaultController = (function () {
+    function DefaultController($scope, $state, $config) {
+        this.$scope = $scope;
+        this.$state = $state;
+        this.$config = $config;
+        console.log($state.current);
+        console.log($config.settings);
+    }
+    return DefaultController;
+}());
+DefaultController.$inject = ["$scope", "$state", "OfConfigService"];
+
 /// <reference types="angular" />
 /// <reference types="angular-translate" />
+/// <reference types="angular-ui-router" />
 "use strict";
 (function (angularJs) {
     var MODULE = "of.config";
-    console.debug("of.config - inicializando módulo");
     angularJs.module(MODULE, [
         "pascalprecht.translate",
+        "ui.router",
+    ]);
+    /**
+     * Etapa de configuración.
+     */
+    angularJs.module(MODULE)
+        .config([
+        "$urlRouterProvider",
+        "OfConfigServiceProvider",
+        configure,
+    ]);
+    /**
+     * Etapa de ejecución.
+     */
+    angularJs.module(MODULE)
+        .run([
+        "$log",
+        "$urlRouter",
+        "$uiRouter",
+        "OfConfigService",
+        run,
     ]);
     /**
      * Services
@@ -420,4 +467,48 @@ var OfSessionStorageService = (function () {
      */
     angularJs.module(MODULE)
         .provider("OfConfigService", OfConfigServiceProvider);
+    /////////////////////////////////////////////////////////////////////////////
+    var statesObserver;
+    function configure(urlRouterProvider, configServiceProvider) {
+        // Ruteo de vistas
+        urlRouterProvider.deferIntercept();
+        urlRouterProvider.otherwise("/home");
+        // Observer para la carga de estados
+        configServiceProvider.statesObservers.push(function (states) {
+            if (statesObserver) {
+                statesObserver(states);
+            }
+        });
+    }
+    /////////////////////////////////////////////////////////////////////////////
+    function run(logService, urlRouterService, uiRouterService, configService) {
+        statesObserver = loadStates;
+        function loadStates(states) {
+            // Los estados funcionan como opciones de menú.
+            // configService.settings.options = states;
+            // Se definen estados del router a partir de los leídos desde el endpoint.
+            states.forEach(function (item) {
+                var op = item;
+                var statedef = {
+                    abstract: op.abstract,
+                    controller: op.controller || DefaultController,
+                    data: op.data,
+                    name: op.name,
+                    parent: op.parent,
+                    templateUrl: configService.settings.pagesPath + op.templateUrl,
+                    url: op.url,
+                };
+                try {
+                    uiRouterService.stateRegistry.register(statedef);
+                }
+                catch (e) {
+                    logService.error(MODULE + " - error registrando estado", op);
+                    throw e;
+                }
+            });
+            // Configura el UrlRouter para escuchar.
+            urlRouterService.sync();
+            urlRouterService.listen();
+        }
+    }
 })(window.angular);

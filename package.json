@@ -25,6 +25,7 @@
   "devDependencies": {
     "@types/angular": "^1.6.17",
     "@types/angular-translate": "^2.15.0",
+    "@types/angular-ui-router": "^1.1.37",
     "@types/node": "^7.0.22",
     "browser-sync": "^2.18.12",
     "del": "^2.2.2",
@@ -39,6 +40,7 @@
     "typescript": "^2.3.2"
   },
   "dependencies": {
+    "@uirouter/angularjs": "^1.0.5",
     "angular": "^1.6.4",
     "angular-translate": "^2.15.1",
     "angular-translate-loader-static-files": "^2.15.1"
