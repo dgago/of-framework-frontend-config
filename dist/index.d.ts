@@ -1,58 +1,4 @@
 /// <reference types="angular" />
-declare class AppState {
-    abstract: boolean;
-    controller: string | ng.IController;
-    data: any;
-    name: string;
-    parent: string;
-    templateUrl: string;
-    url: string;
-}
-
-interface IKeyValue {
-    id: string;
-    value: any;
-}
-
-declare class LanguageSettings {
-    localizationPrefix: string;
-    localizationSuffix: string;
-    storageKey: string;
-    storage: IBrowserStorage;
-    lang: string;
-}
-
-declare type StateSettingsCallback = (states: Array<UiOption | UiGroup>) => void;
-declare class StateSettings {
-    statesEndpoint: string;
-    observers: StateSettingsCallback[];
-}
-
-declare class UiGroup {
-    icon: string;
-    label: string;
-    tooltip: string;
-    options: UiOption[];
-}
-
-/// <reference types="angular" />
-declare type UiOptionAction = (ev: ng.IAngularEvent, state: AppState) => void;
-declare class UiOption extends AppState {
-    type: MenuOptionType;
-    icon: string;
-    label: string;
-    tooltip: string;
-    cssClass: string;
-    action: string | UiOptionAction;
-    auth: any;
-}
-declare enum MenuOptionType {
-    Action = 1,
-    Url = 2,
-    State = 3,
-}
-
-/// <reference types="angular" />
 /// <reference types="angular-translate" />
 /**
  * Interface del servicio
@@ -73,9 +19,9 @@ declare class OfConfigService implements IOfConfigService {
     private $http;
     private $log;
     private $translate;
-    private settingsEndpoint;
-    private stateSettings;
-    private languageSettings;
+    private settingsConfig;
+    private statesConfig;
+    private languageConfig;
     /**
      * Settings de la app
      */
@@ -90,11 +36,11 @@ declare class OfConfigService implements IOfConfigService {
      * @param http Servicio http
      * @param log Servicio de log
      * @param translate Servicio multilenguaje
-     * @param settingsEndpoint Endpoint desde donde se cargan las settings de la app
-     * @param stateSettings Parámetros de configuración para obtener los estados de la app
-     * @param languageSettings Parámetros de configuración de multilenguaje
+     * @param settingsConfig Configuración para obtener las settings de la app
+     * @param statesConfig Configuración para obtener los estados de la app
+     * @param languageConfig Parámetros de configuración de multilenguaje
      */
-    constructor($http: ng.IHttpService, $log: ng.ILogService, $translate: ng.translate.ITranslateService, settingsEndpoint: string, stateSettings: StateSettings, languageSettings: LanguageSettings);
+    constructor($http: ng.IHttpService, $log: ng.ILogService, $translate: ng.translate.ITranslateService, settingsConfig: SettingsConfig, statesConfig: StatesConfig, languageConfig: LanguageConfig);
     /**
      * Carga la configuración desde el endpoint designado
      */
@@ -134,17 +80,29 @@ declare class OfConfigServiceProvider implements ng.IServiceProvider {
      */
     $get: (string | (($http: angular.IHttpService, $log: angular.ILogService, $translate: angular.translate.ITranslateService) => IOfConfigService))[];
     /**
-     * Parámetros de configuración para obtener los estados de la app
+     * Observers para settings
      */
-    stateSettings: StateSettings;
+    settingsObservers: SettingsEndpointCallback[];
+    /**
+     * Observers para states
+     */
+    statesObservers: StatesEndpointCallback[];
+    /**
+     * Nombre del módulo
+     */
+    private MODULE;
     /**
      * Endpoint desde donde se cargan las settings
      */
     private settingsEndpoint;
     /**
+     * Endpoint desde donde se cargan los estados de la app
+     */
+    private statesEndpoint;
+    /**
      * Parámetros de configuración de multilenguaje
      */
-    private languageSettings;
+    private languageConfig;
     /**
      * Constructor del proveedor
      * @param translateProvider Proveedor de configuración de multilenguaje
@@ -156,15 +114,74 @@ declare class OfConfigServiceProvider implements ng.IServiceProvider {
      */
     configureSettings(settingsEndpoint: string): void;
     /**
-     * Configuración de multilenguaje
-     * @param languageSettings Parámetros de configuración de multilenguaje
-     */
-    configureLanguage(languageSettings: LanguageSettings): void;
-    /**
      * Configuración de los estados de la app
-     * @param stateSettings Parámetros de configuración para obtener los estados de la app
+     * @param statesEndpoint Endpoint desde donde se cargan los estados de la app
      */
-    configureStates(stateSettings: StateSettings): void;
+    configureStates(statesEndpoint: string): void;
+    /**
+     * Configuración de multilenguaje
+     * @param languageConfig Parámetros de configuración de multilenguaje
+     */
+    configureLanguage(languageConfig: LanguageConfig): void;
+}
+
+/// <reference types="angular" />
+declare class AppState {
+    abstract: boolean;
+    controller: string | ng.IController;
+    data: any;
+    name: string;
+    parent: string;
+    templateUrl: string;
+    url: string;
+}
+
+interface IKeyValue {
+    id: string;
+    value: any;
+}
+
+declare class LanguageConfig {
+    localizationPrefix: string;
+    localizationSuffix: string;
+    storageKey: string;
+    storage: IBrowserStorage;
+    lang: string;
+}
+
+declare type SettingsEndpointCallback = (settings: any) => void;
+declare type StatesEndpointCallback = (states: Array<UiOption | UiGroup>) => void;
+declare class StatesConfig {
+    endpoint: string;
+    observers: StatesEndpointCallback[];
+}
+declare class SettingsConfig {
+    endpoint: string;
+    observers: SettingsEndpointCallback[];
+}
+
+declare class UiGroup {
+    icon: string;
+    label: string;
+    tooltip: string;
+    options: UiOption[];
+}
+
+/// <reference types="angular" />
+declare type UiOptionAction = (ev: ng.IAngularEvent, state: AppState) => void;
+declare class UiOption extends AppState {
+    type: MenuOptionType;
+    icon: string;
+    label: string;
+    tooltip: string;
+    cssClass: string;
+    action: string | UiOptionAction;
+    auth: any;
+}
+declare enum MenuOptionType {
+    Action = 1,
+    Url = 2,
+    State = 3,
 }
 
 /// <reference types="angular" />

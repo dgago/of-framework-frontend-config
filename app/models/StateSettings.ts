@@ -1,8 +1,16 @@
-type StateSettingsCallback = (states: Array<UiOption | UiGroup>) => void;
+type SettingsEndpointCallback = (settings: any) => void;
+type StatesEndpointCallback = (states: Array<UiOption | UiGroup>) => void;
 
-class StateSettings {
+class StatesConfig {
 
-  public statesEndpoint: string;
-  public observers: StateSettingsCallback[];
+  public endpoint: string;
+  public observers: StatesEndpointCallback[];
+
+}
+
+class SettingsConfig {
+
+  public endpoint: string;
+  public observers: SettingsEndpointCallback[];
 
 }
