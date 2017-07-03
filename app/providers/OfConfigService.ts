@@ -84,7 +84,11 @@ class OfConfigService implements IOfConfigService {
 
       if (this.settingsConfig.observers) {
         this.settingsConfig.observers.forEach((callback: SettingsEndpointCallback) => {
-          callback(res.data);
+          try {
+            callback(res.data);
+          } catch (e) {
+            this.$log.error(e);
+          }
         });
       }
 
@@ -127,7 +131,11 @@ class OfConfigService implements IOfConfigService {
 
       if (this.statesConfig.observers) {
         this.statesConfig.observers.forEach((callback: StatesEndpointCallback) => {
-          callback(res.data);
+          try {
+            callback(res.data);
+          } catch (e) {
+            this.$log.error(e);
+          }
         });
       }
 

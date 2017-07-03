@@ -1,4 +1,63 @@
 /// <reference types="angular" />
+declare class AppState {
+    abstract: boolean;
+    controller: string | ng.IController;
+    data: any;
+    name: string;
+    parent: string;
+    templateUrl: string;
+    url: string;
+}
+
+interface IKeyValue {
+    id: string;
+    value: any;
+}
+
+declare class LanguageConfig {
+    localizationPrefix: string;
+    localizationSuffix: string;
+    storageKey: string;
+    storage: IBrowserStorage;
+    lang: string;
+}
+
+declare type SettingsEndpointCallback = (settings: any) => void;
+declare type StatesEndpointCallback = (states: Array<UiOption | UiGroup>) => void;
+declare class StatesConfig {
+    endpoint: string;
+    observers: StatesEndpointCallback[];
+}
+declare class SettingsConfig {
+    endpoint: string;
+    observers: SettingsEndpointCallback[];
+}
+
+declare class UiGroup {
+    icon: string;
+    label: string;
+    tooltip: string;
+    options: UiOption[];
+}
+
+/// <reference types="angular" />
+declare type UiOptionAction = (ev: ng.IAngularEvent, state: AppState) => void;
+declare class UiOption extends AppState {
+    type: MenuOptionType;
+    icon: string;
+    label: string;
+    tooltip: string;
+    cssClass: string;
+    action: string | UiOptionAction;
+    auth: any;
+}
+declare enum MenuOptionType {
+    Action = 1,
+    Url = 2,
+    State = 3,
+}
+
+/// <reference types="angular" />
 /// <reference types="angular-translate" />
 /**
  * Interface del servicio
@@ -123,65 +182,6 @@ declare class OfConfigServiceProvider implements ng.IServiceProvider {
      * @param languageConfig Parámetros de configuración de multilenguaje
      */
     configureLanguage(languageConfig: LanguageConfig): void;
-}
-
-/// <reference types="angular" />
-declare class AppState {
-    abstract: boolean;
-    controller: string | ng.IController;
-    data: any;
-    name: string;
-    parent: string;
-    templateUrl: string;
-    url: string;
-}
-
-interface IKeyValue {
-    id: string;
-    value: any;
-}
-
-declare class LanguageConfig {
-    localizationPrefix: string;
-    localizationSuffix: string;
-    storageKey: string;
-    storage: IBrowserStorage;
-    lang: string;
-}
-
-declare type SettingsEndpointCallback = (settings: any) => void;
-declare type StatesEndpointCallback = (states: Array<UiOption | UiGroup>) => void;
-declare class StatesConfig {
-    endpoint: string;
-    observers: StatesEndpointCallback[];
-}
-declare class SettingsConfig {
-    endpoint: string;
-    observers: SettingsEndpointCallback[];
-}
-
-declare class UiGroup {
-    icon: string;
-    label: string;
-    tooltip: string;
-    options: UiOption[];
-}
-
-/// <reference types="angular" />
-declare type UiOptionAction = (ev: ng.IAngularEvent, state: AppState) => void;
-declare class UiOption extends AppState {
-    type: MenuOptionType;
-    icon: string;
-    label: string;
-    tooltip: string;
-    cssClass: string;
-    action: string | UiOptionAction;
-    auth: any;
-}
-declare enum MenuOptionType {
-    Action = 1,
-    Url = 2,
-    State = 3,
 }
 
 /// <reference types="angular" />
