@@ -1,4 +1,4 @@
-class LanguageSettings {
+class LanguageConfig {
 
   public localizationPrefix: string = "localization/";
   public localizationSuffix: string = ".json";

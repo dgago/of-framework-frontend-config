@@ -20,15 +20,34 @@ class OfConfigServiceProvider implements ng.IServiceProvider {
       $log: ng.ILogService,
       $translate: ng.translate.ITranslateService,
     ): IOfConfigService => {
-      console.debug("logger", $log);
-      const instance = new OfConfigService($http, $log, $translate, this.settingsEndpoint, this.stateSettings, this.languageSettings);
+
+      const settingsConfig = new SettingsConfig();
+      settingsConfig.endpoint = this.settingsEndpoint;
+      settingsConfig.observers = this.settingsObservers;
+
+      const statesConfig = new StatesConfig();
+      statesConfig.endpoint = this.statesEndpoint;
+      statesConfig.observers = this.statesObservers;
+
+      const instance = new OfConfigService($http, $log, $translate,
+        settingsConfig, statesConfig, this.languageConfig);
       return instance;
     }];
 
   /**
-   * Parámetros de configuración para obtener los estados de la app
+   * Observers para settings
    */
-  public stateSettings: StateSettings;
+  public settingsObservers: SettingsEndpointCallback[] = [];
+
+  /**
+   * Observers para states
+   */
+  public statesObservers: StatesEndpointCallback[] = [];
+
+  /**
+   * Nombre del módulo
+   */
+  private MODULE: string = "of.config";
 
   /**
    * Endpoint desde donde se cargan las settings
@@ -36,9 +55,14 @@ class OfConfigServiceProvider implements ng.IServiceProvider {
   private settingsEndpoint: string;
 
   /**
+   * Endpoint desde donde se cargan los estados de la app
+   */
+  private statesEndpoint: string;
+
+  /**
    * Parámetros de configuración de multilenguaje
    */
-  private languageSettings: LanguageSettings;
+  private languageConfig: LanguageConfig;
 
   /**
    * Constructor del proveedor
@@ -54,38 +78,37 @@ class OfConfigServiceProvider implements ng.IServiceProvider {
    * @param settingsEndpoint Endpoint desde donde se cargan las settings
    */
   public configureSettings(settingsEndpoint: string) {
-    console.debug("of.config - configurando settings", settingsEndpoint);
+    console.debug(this.MODULE + " - configurando settings", settingsEndpoint);
     this.settingsEndpoint = settingsEndpoint;
   }
 
   /**
-   * Configuración de multilenguaje
-   * @param languageSettings Parámetros de configuración de multilenguaje
+   * Configuración de los estados de la app
+   * @param statesEndpoint Endpoint desde donde se cargan los estados de la app
    */
-  public configureLanguage(languageSettings: LanguageSettings) {
-    console.debug("of.config - configurando lenguaje", languageSettings);
-    this.languageSettings = languageSettings;
+  public configureStates(statesEndpoint: string) {
+    console.debug(this.MODULE + " - configurando estados", statesEndpoint);
+    this.statesEndpoint = statesEndpoint;
+  }
+
+  /**
+   * Configuración de multilenguaje
+   * @param languageConfig Parámetros de configuración de multilenguaje
+   */
+  public configureLanguage(languageConfig: LanguageConfig) {
+    console.debug(this.MODULE + " - configurando lenguaje", languageConfig);
+    this.languageConfig = languageConfig;
 
     this.$translateProvider.useStaticFilesLoader({
-      prefix: languageSettings.localizationPrefix,
-      suffix: languageSettings.localizationSuffix,
+      prefix: languageConfig.localizationPrefix,
+      suffix: languageConfig.localizationSuffix,
     });
     this.$translateProvider.useSanitizeValueStrategy("escape");
 
     // Establecimiento del lenguaje por defecto
-    if (!languageSettings.lang) {
-      languageSettings.lang = (navigator.language || (navigator as any).userLanguage).split("-")[0];
+    if (!languageConfig.lang) {
+      languageConfig.lang = (navigator.language || (navigator as any).userLanguage).split("-")[0];
     }
-    this.$translateProvider.preferredLanguage(languageSettings.lang);
+    this.$translateProvider.preferredLanguage(languageConfig.lang);
   }
-
-  /**
-   * Configuración de los estados de la app
-   * @param stateSettings Parámetros de configuración para obtener los estados de la app
-   */
-  public configureStates(stateSettings: StateSettings) {
-    console.debug("of.config - configurando estados", stateSettings);
-    this.stateSettings = stateSettings;
-  }
-
 }
