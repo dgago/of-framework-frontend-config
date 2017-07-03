@@ -40,6 +40,10 @@ class OfHttpService<T> {
     return this.$http.put(this.baseUri + this.resourcePath + id, item);
   }
 
+  public delete(id: string): ng.IHttpPromise<T> {
+    return this.$http.delete(this.baseUri + this.resourcePath + id);
+  }
+
   /**
    * Transforma un Array de objetos con campos id y value a un único
    * objeto que tiene atributos con el nombre del campo id en lowercase

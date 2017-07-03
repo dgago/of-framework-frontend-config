@@ -193,6 +193,7 @@ declare class OfHttpService<T> {
     create(item: T): ng.IHttpPromise<T>;
     findOne(id: string): ng.IHttpPromise<T>;
     update(id: string, item: T): ng.IHttpPromise<T>;
+    delete(id: string): ng.IHttpPromise<T>;
     /**
      * Transforma un Array de objetos con campos id y value a un único
      * objeto que tiene atributos con el nombre del campo id en lowercase

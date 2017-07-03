@@ -259,6 +259,9 @@ var OfHttpService = (function () {
     OfHttpService.prototype.update = function (id, item) {
         return this.$http.put(this.baseUri + this.resourcePath + id, item);
     };
+    OfHttpService.prototype.delete = function (id) {
+        return this.$http.delete(this.baseUri + this.resourcePath + id);
+    };
     /**
      * Transforma un Array de objetos con campos id y value a un único
      * objeto que tiene atributos con el nombre del campo id en lowercase

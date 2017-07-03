@@ -4,7 +4,10 @@
   "description": "Módulo de configuración para front end.",
   "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "gulp clean",
+    "compile": "gulp compile",
+    "build": "gulp build",
+    "serve": "gulp serve"
   },
   "repository": {
     "type": "git",
