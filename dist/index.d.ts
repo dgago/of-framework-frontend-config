@@ -25,7 +25,7 @@ declare class LanguageSettings {
 declare type StateSettingsCallback = (states: Array<UiOption | UiGroup>) => void;
 declare class StateSettings {
     statesEndpoint: string;
-    callback: StateSettingsCallback;
+    observers: StateSettingsCallback[];
 }
 
 declare class UiGroup {
@@ -84,6 +84,7 @@ declare class OfConfigService implements IOfConfigService {
      * Estados de la app
      */
     states: Array<UiGroup | UiOption>;
+    private MODULE;
     /**
      * Constructor del servicio
      * @param http Servicio http
@@ -133,13 +134,13 @@ declare class OfConfigServiceProvider implements ng.IServiceProvider {
      */
     $get: (string | (($http: angular.IHttpService, $log: angular.ILogService, $translate: angular.translate.ITranslateService) => IOfConfigService))[];
     /**
+     * Parámetros de configuración para obtener los estados de la app
+     */
+    stateSettings: StateSettings;
+    /**
      * Endpoint desde donde se cargan las settings
      */
     private settingsEndpoint;
-    /**
-     * Parámetros de configuración para obtener los estados de la app
-     */
-    private stateSettings;
     /**
      * Parámetros de configuración de multilenguaje
      */

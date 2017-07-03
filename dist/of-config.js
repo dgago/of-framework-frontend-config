@@ -80,7 +80,7 @@ var OfConfigService = (function () {
          * Estados de la app
          */
         this.states = [];
-        console.debug("logger", $log);
+        this.MODULE = "of.config";
         this.loadSettings()
             .then(function (res) {
             return _this.loadStates();
@@ -97,14 +97,14 @@ var OfConfigService = (function () {
      */
     OfConfigService.prototype.loadSettings = function () {
         var _this = this;
-        this.$log.debug("of.config - cargando configuración");
+        this.$log.debug(this.MODULE + " - cargando configuración");
         if (!this.settingsEndpoint) {
-            this.$log.info("of.config - no se especifica endpoint para configuración");
+            this.$log.info(this.MODULE + " - no se especifica endpoint para configuración");
             return null;
         }
         var pr = this.$http.get(this.settingsEndpoint);
         pr.then(function (res) {
-            _this.$log.debug("of.config - configuración cargada", res.data);
+            _this.$log.debug(_this.MODULE + " - configuración cargada", res.data);
             _this.settings = angular.extend(_this.settings, res.data);
             return res.data;
         });
@@ -114,13 +114,13 @@ var OfConfigService = (function () {
      * Inicialización del lenguaje a utilizar en la aplicación
      */
     OfConfigService.prototype.loadLanguage = function () {
-        this.$log.debug("of.config - cargando lenguage");
+        this.$log.debug(this.MODULE + " - cargando lenguage");
         if (this.languageSettings) {
             this.setLanguage(this.getLanguage());
-            this.$log.debug("of.config - lenguaje cargado", this.languageSettings);
+            this.$log.debug(this.MODULE + " - lenguaje cargado", this.languageSettings);
         }
         else {
-            this.$log.info("of.config - no se especifica configuración para lenguaje");
+            this.$log.info(this.MODULE + " - no se especifica configuración para lenguaje");
         }
     };
     /**
@@ -128,18 +128,19 @@ var OfConfigService = (function () {
      */
     OfConfigService.prototype.loadStates = function () {
         var _this = this;
-        console.debug("logger", this.$log);
-        this.$log.debug("of.config - cargando estados");
+        this.$log.debug(this.MODULE + " - cargando estados");
         if (!this.stateSettings) {
-            this.$log.info("of.config - no se especifica endpoint para estados");
+            this.$log.info(this.MODULE + " - no se especifica endpoint para estados");
             return null;
         }
         var pr = this.$http.get(this.stateSettings.statesEndpoint);
         pr.then(function (res) {
-            _this.$log.debug("of.config - estados cargados", res.data);
+            _this.$log.debug(_this.MODULE + " - estados cargados", res.data);
             _this.states = angular.extend(_this.states, res.data);
-            if (_this.stateSettings.callback) {
-                _this.stateSettings.callback(res.data);
+            if (_this.stateSettings.observers) {
+                _this.stateSettings.observers.forEach(function (callback) {
+                    callback(res.data);
+                });
             }
             return res.data;
         });
@@ -365,20 +366,21 @@ var OfSessionStorageService = (function () {
 /// <reference types="angular-translate" />
 "use strict";
 (function (angularJs) {
+    var MODULE = "of.config";
     console.debug("of.config - inicializando módulo");
-    angularJs.module("of.config", [
+    angularJs.module(MODULE, [
         "pascalprecht.translate",
     ]);
     /**
      * Services
      */
-    angularJs.module("of.config")
+    angularJs.module(MODULE)
         .service("OfHttpService", OfHttpService);
-    angularJs.module("of.config")
+    angularJs.module(MODULE)
         .service("OfStorageService", OfLocalStorageService);
     /**
      * Providers
      */
-    angularJs.module("of.config")
+    angularJs.module(MODULE)
         .provider("OfConfigService", OfConfigServiceProvider);
 })(window.angular);
