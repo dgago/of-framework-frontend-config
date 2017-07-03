@@ -34,6 +34,8 @@ class OfConfigService implements IOfConfigService {
    */
   public states: Array<UiGroup | UiOption> = [];
 
+  private MODULE: string = "of.config";
+
   /**
    * Constructor del servicio
    * @param http Servicio http
@@ -51,7 +53,6 @@ class OfConfigService implements IOfConfigService {
     private stateSettings: StateSettings,
     private languageSettings: LanguageSettings,
   ) {
-    console.debug("logger", $log);
     this.loadSettings()
       .then((res: any) => {
         return this.loadStates();
@@ -68,16 +69,16 @@ class OfConfigService implements IOfConfigService {
    * Carga la configuración desde el endpoint designado
    */
   public loadSettings(): ng.IHttpPromise<any> {
-    this.$log.debug("of.config - cargando configuración");
+    this.$log.debug(this.MODULE + " - cargando configuración");
 
     if (!this.settingsEndpoint) {
-      this.$log.info("of.config - no se especifica endpoint para configuración");
+      this.$log.info(this.MODULE + " - no se especifica endpoint para configuración");
       return null;
     }
 
     const pr = this.$http.get(this.settingsEndpoint);
     pr.then((res: ng.IHttpPromiseCallbackArg<any>) => {
-      this.$log.debug("of.config - configuración cargada", res.data);
+      this.$log.debug(this.MODULE + " - configuración cargada", res.data);
 
       this.settings = angular.extend(this.settings, res.data);
 
@@ -91,13 +92,13 @@ class OfConfigService implements IOfConfigService {
    * Inicialización del lenguaje a utilizar en la aplicación
    */
   public loadLanguage() {
-    this.$log.debug("of.config - cargando lenguage");
+    this.$log.debug(this.MODULE + " - cargando lenguage");
 
     if (this.languageSettings) {
       this.setLanguage(this.getLanguage());
-      this.$log.debug("of.config - lenguaje cargado", this.languageSettings);
+      this.$log.debug(this.MODULE + " - lenguaje cargado", this.languageSettings);
     } else {
-      this.$log.info("of.config - no se especifica configuración para lenguaje");
+      this.$log.info(this.MODULE + " - no se especifica configuración para lenguaje");
     }
   }
 
@@ -105,17 +106,16 @@ class OfConfigService implements IOfConfigService {
    * Carga los estados de la app
    */
   public loadStates(): ng.IHttpPromise<Array<UiGroup | UiOption>> {
-    console.debug("logger", this.$log);
-    this.$log.debug("of.config - cargando estados");
+    this.$log.debug(this.MODULE + " - cargando estados");
 
     if (!this.stateSettings) {
-      this.$log.info("of.config - no se especifica endpoint para estados");
+      this.$log.info(this.MODULE + " - no se especifica endpoint para estados");
       return null;
     }
 
     const pr = this.$http.get(this.stateSettings.statesEndpoint);
     pr.then((res: ng.IHttpPromiseCallbackArg<Array<UiGroup | UiOption>>) => {
-      this.$log.debug("of.config - estados cargados", res.data);
+      this.$log.debug(this.MODULE + " - estados cargados", res.data);
 
       this.states = angular.extend(this.states, res.data);
 

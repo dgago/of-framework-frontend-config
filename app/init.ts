@@ -5,24 +5,26 @@
 
 ((angularJs: ng.IAngularStatic) => {
 
+  const MODULE: string = "of.config";
+
   console.debug("of.config - inicializando módulo");
-  angularJs.module("of.config", [
+  angularJs.module(MODULE, [
     "pascalprecht.translate",
   ]);
 
   /**
    * Services
    */
-  angularJs.module("of.config")
+  angularJs.module(MODULE)
     .service("OfHttpService", OfHttpService);
 
-  angularJs.module("of.config")
+  angularJs.module(MODULE)
     .service("OfStorageService", OfLocalStorageService);
 
   /**
    * Providers
    */
-  angularJs.module("of.config")
+  angularJs.module(MODULE)
     .provider("OfConfigService", OfConfigServiceProvider);
 
 })((window as any).angular);
