@@ -119,8 +119,10 @@ class OfConfigService implements IOfConfigService {
 
       this.states = angular.extend(this.states, res.data);
 
-      if (this.stateSettings.callback) {
-        this.stateSettings.callback(res.data);
+      if (this.stateSettings.observers) {
+        this.stateSettings.observers.forEach((callback: StateSettingsCallback) => {
+          callback(res.data);
+        });
       }
 
       return res.data;

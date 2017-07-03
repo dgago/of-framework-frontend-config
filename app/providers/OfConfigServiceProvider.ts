@@ -26,14 +26,14 @@ class OfConfigServiceProvider implements ng.IServiceProvider {
     }];
 
   /**
+   * Parámetros de configuración para obtener los estados de la app
+   */
+  public stateSettings: StateSettings;
+
+  /**
    * Endpoint desde donde se cargan las settings
    */
   private settingsEndpoint: string;
-
-  /**
-   * Parámetros de configuración para obtener los estados de la app
-   */
-  private stateSettings: StateSettings;
 
   /**
    * Parámetros de configuración de multilenguaje

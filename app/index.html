@@ -34,7 +34,8 @@
 
       var stateSettings = new StateSettings();
       stateSettings.statesEndpoint = "/states.json";
-      stateSettings.callback = function(state) { console.debug("estados cargados b", state); };
+      var callback = function(state) { console.debug("estados cargados b", state); };
+      stateSettings.observers = [callback];
       $configProvider.configureStates(stateSettings);
     }]);
 
