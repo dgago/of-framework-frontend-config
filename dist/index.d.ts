@@ -1,62 +1,4 @@
-/// <reference types="angular" />
-declare class AppState {
-    abstract: boolean;
-    controller: string | ng.IController;
-    data: any;
-    name: string;
-    parent: string;
-    templateUrl: string;
-    url: string;
-}
-
-interface IKeyValue {
-    id: string;
-    value: any;
-}
-
-declare class LanguageConfig {
-    localizationPrefix: string;
-    localizationSuffix: string;
-    storageKey: string;
-    storage: IBrowserStorage;
-    lang: string;
-}
-
-declare type SettingsEndpointCallback = (settings: any) => void;
-declare type StatesEndpointCallback = (states: Array<UiOption | UiGroup>) => void;
-declare class StatesConfig {
-    endpoint: string;
-    observers: StatesEndpointCallback[];
-}
-declare class SettingsConfig {
-    endpoint: string;
-    observers: SettingsEndpointCallback[];
-}
-
-declare class UiGroup {
-    icon: string;
-    label: string;
-    tooltip: string;
-    options: UiOption[];
-}
-
-/// <reference types="angular" />
-declare type UiOptionAction = (ev: ng.IAngularEvent, state: AppState) => void;
-declare class UiOption extends AppState {
-    type: MenuOptionType;
-    icon: string;
-    label: string;
-    tooltip: string;
-    cssClass: string;
-    action: string | UiOptionAction;
-    auth: any;
-}
-declare enum MenuOptionType {
-    Action = 1,
-    Url = 2,
-    State = 3,
-}
-
+/// <reference types="angular-ui-router" />
 /// <reference types="angular" />
 /// <reference types="angular-translate" />
 /**
@@ -64,7 +6,7 @@ declare enum MenuOptionType {
  */
 interface IOfConfigService {
     settings: any;
-    states: Array<UiGroup | UiOption>;
+    states: ng.ui.IState[];
     loadSettings(): ng.IHttpPromise<any>;
     loadLanguage(): void;
     loadStates(): ng.IHttpPromise<any>;
@@ -88,7 +30,7 @@ declare class OfConfigService implements IOfConfigService {
     /**
      * Estados de la app
      */
-    states: Array<UiGroup | UiOption>;
+    states: ng.ui.IState[];
     private MODULE;
     /**
      * Constructor del servicio
@@ -111,7 +53,7 @@ declare class OfConfigService implements IOfConfigService {
     /**
      * Carga los estados de la app
      */
-    loadStates(): ng.IHttpPromise<Array<UiGroup | UiOption>>;
+    loadStates(): ng.IHttpPromise<ng.ui.IState[]>;
     /**
      * Devuelve el lenguaje que se está utilizando en la aplicación
      */
@@ -182,6 +124,48 @@ declare class OfConfigServiceProvider implements ng.IServiceProvider {
      * @param languageConfig Parámetros de configuración de multilenguaje
      */
     configureLanguage(languageConfig: LanguageConfig): void;
+}
+
+interface IKeyValue {
+    id: string;
+    value: any;
+}
+
+declare class LanguageConfig {
+    localizationPrefix: string;
+    localizationSuffix: string;
+    storageKey: string;
+    storage: IBrowserStorage;
+    lang: string;
+}
+
+/// <reference types="angular-ui-router" />
+declare type SettingsEndpointCallback = (settings: any) => void;
+declare type StatesEndpointCallback = (states: ng.ui.IState[]) => void;
+declare class StatesConfig {
+    endpoint: string;
+    observers: StatesEndpointCallback[];
+}
+declare class SettingsConfig {
+    endpoint: string;
+    observers: SettingsEndpointCallback[];
+}
+
+/// <reference types="angular" />
+/// <reference types="angular-ui-router" />
+declare class UiOption {
+    type: MenuOptionType;
+    icon: string;
+    label: string;
+    tooltip: string;
+    cssClass: string;
+    action: string | ((ev: ng.IAngularEvent, state: ng.ui.IState) => void);
+    auth: any;
+}
+declare enum MenuOptionType {
+    Action = 1,
+    Url = 2,
+    State = 3,
 }
 
 /// <reference types="angular" />

@@ -1,61 +1,3 @@
-var AppState = (function () {
-    function AppState() {
-    }
-    return AppState;
-}());
-
-
-var LanguageConfig = (function () {
-    function LanguageConfig() {
-        this.localizationPrefix = "localization/";
-        this.localizationSuffix = ".json";
-        this.storageKey = "language";
-        this.lang = undefined;
-    }
-    return LanguageConfig;
-}());
-
-var StatesConfig = (function () {
-    function StatesConfig() {
-    }
-    return StatesConfig;
-}());
-var SettingsConfig = (function () {
-    function SettingsConfig() {
-    }
-    return SettingsConfig;
-}());
-
-var UiGroup = (function () {
-    function UiGroup() {
-    }
-    return UiGroup;
-}());
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var UiOption = (function (_super) {
-    __extends(UiOption, _super);
-    function UiOption() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return UiOption;
-}(AppState));
-var MenuOptionType;
-(function (MenuOptionType) {
-    MenuOptionType[MenuOptionType["Action"] = 1] = "Action";
-    MenuOptionType[MenuOptionType["Url"] = 2] = "Url";
-    MenuOptionType[MenuOptionType["State"] = 3] = "State";
-})(MenuOptionType || (MenuOptionType = {}));
-
 /**
  * Implementación del servicio
  */
@@ -267,6 +209,40 @@ var OfConfigServiceProvider = (function () {
  * Inyección de dependencias del proveedor
  */
 OfConfigServiceProvider.$inject = ["$translateProvider"];
+
+
+var LanguageConfig = (function () {
+    function LanguageConfig() {
+        this.localizationPrefix = "localization/";
+        this.localizationSuffix = ".json";
+        this.storageKey = "language";
+        this.lang = undefined;
+    }
+    return LanguageConfig;
+}());
+
+var StatesConfig = (function () {
+    function StatesConfig() {
+    }
+    return StatesConfig;
+}());
+var SettingsConfig = (function () {
+    function SettingsConfig() {
+    }
+    return SettingsConfig;
+}());
+
+var UiOption = (function () {
+    function UiOption() {
+    }
+    return UiOption;
+}());
+var MenuOptionType;
+(function (MenuOptionType) {
+    MenuOptionType[MenuOptionType["Action"] = 1] = "Action";
+    MenuOptionType[MenuOptionType["Url"] = 2] = "Url";
+    MenuOptionType[MenuOptionType["State"] = 3] = "State";
+})(MenuOptionType || (MenuOptionType = {}));
 
 /**
  * Servicio base para acceso HTTP.
@@ -488,21 +464,11 @@ DefaultController.$inject = ["$scope", "$state", "OfConfigService"];
             // configService.settings.options = states;
             // Se definen estados del router a partir de los leídos desde el endpoint.
             states.forEach(function (item) {
-                var op = item;
-                var statedef = {
-                    abstract: op.abstract,
-                    controller: op.controller || DefaultController,
-                    data: op.data,
-                    name: op.name,
-                    parent: op.parent,
-                    templateUrl: configService.settings.pagesPath + op.templateUrl,
-                    url: op.url,
-                };
                 try {
-                    uiRouterService.stateRegistry.register(statedef);
+                    uiRouterService.stateRegistry.register(item);
                 }
                 catch (e) {
-                    logService.error(MODULE + " - error registrando estado", op);
+                    logService.error(MODULE + " - error registrando estado", item);
                     throw e;
                 }
             });

@@ -63,7 +63,7 @@
     urlRouterProvider.otherwise("/home");
 
     // Observer para la carga de estados
-    configServiceProvider.statesObservers.push((states: Array<UiOption | UiGroup>) => {
+    configServiceProvider.statesObservers.push((states: ng.ui.IState[]) => {
       if (statesObserver) {
         statesObserver(states);
       }
@@ -80,28 +80,16 @@
   ) {
     statesObserver = loadStates;
 
-    function loadStates(states: Array<UiOption | UiGroup>) {
+    function loadStates(states: ng.ui.IState[]) {
       // Los estados funcionan como opciones de menú.
       // configService.settings.options = states;
 
       // Se definen estados del router a partir de los leídos desde el endpoint.
-      states.forEach((item: UiOption | UiGroup) => {
-        const op: UiOption = item as UiOption;
-
-        const statedef = {
-          abstract: op.abstract,
-          controller: op.controller || DefaultController,
-          data: op.data,
-          name: op.name,
-          parent: op.parent,
-          templateUrl: configService.settings.pagesPath + op.templateUrl,
-          url: op.url,
-        };
-
+      states.forEach((item: ng.ui.IState) => {
         try {
-          uiRouterService.stateRegistry.register(statedef);
+          uiRouterService.stateRegistry.register(item);
         } catch (e) {
-          logService.error(MODULE + " - error registrando estado", op);
+          logService.error(MODULE + " - error registrando estado", item);
           throw e;
         }
       });
