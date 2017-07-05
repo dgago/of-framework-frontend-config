@@ -5,7 +5,7 @@ interface IOfConfigService {
 
   settings: any;
 
-  states: Array<UiGroup | UiOption>;
+  states: ng.ui.IState[];
 
   loadSettings(): ng.IHttpPromise<any>;
 
@@ -32,7 +32,7 @@ class OfConfigService implements IOfConfigService {
   /**
    * Estados de la app
    */
-  public states: Array<UiGroup | UiOption> = [];
+  public states: ng.ui.IState[] = [];
 
   private MODULE: string = "of.config";
 
@@ -115,7 +115,7 @@ class OfConfigService implements IOfConfigService {
   /**
    * Carga los estados de la app
    */
-  public loadStates(): ng.IHttpPromise<Array<UiGroup | UiOption>> {
+  public loadStates(): ng.IHttpPromise<ng.ui.IState[]> {
     this.$log.debug(this.MODULE + " - cargando estados");
 
     if (!this.statesConfig || !this.statesConfig.endpoint) {
@@ -124,7 +124,7 @@ class OfConfigService implements IOfConfigService {
     }
 
     const pr = this.$http.get(this.statesConfig.endpoint);
-    pr.then((res: ng.IHttpPromiseCallbackArg<Array<UiGroup | UiOption>>) => {
+    pr.then((res: ng.IHttpPromiseCallbackArg<ng.ui.IState[]>) => {
       this.$log.debug(this.MODULE + " - estados cargados", res.data);
 
       this.states = angular.extend(this.states, res.data);

@@ -1,6 +1,4 @@
-type UiOptionAction = (ev: ng.IAngularEvent, state: AppState) => void;
-
-class UiOption extends AppState {
+class UiOption {
 
   public type: MenuOptionType;
 
@@ -10,7 +8,7 @@ class UiOption extends AppState {
 
   public cssClass: string;
 
-  public action: string | UiOptionAction;
+  public action: string | ((ev: ng.IAngularEvent, state: ng.ui.IState) => void);
   public auth: any;
 
 }

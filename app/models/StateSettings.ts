@@ -1,5 +1,5 @@
 type SettingsEndpointCallback = (settings: any) => void;
-type StatesEndpointCallback = (states: Array<UiOption | UiGroup>) => void;
+type StatesEndpointCallback = (states: ng.ui.IState[]) => void;
 
 class StatesConfig {
 
