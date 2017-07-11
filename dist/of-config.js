@@ -1,3 +1,38 @@
+
+var LanguageConfig = (function () {
+    function LanguageConfig() {
+        this.localizationPrefix = "localization/";
+        this.localizationSuffix = ".json";
+        this.storageKey = "language";
+        this.lang = undefined;
+    }
+    return LanguageConfig;
+}());
+
+var SettingsConfig = (function () {
+    function SettingsConfig() {
+    }
+    return SettingsConfig;
+}());
+
+var StatesConfig = (function () {
+    function StatesConfig() {
+    }
+    return StatesConfig;
+}());
+
+var UiOption = (function () {
+    function UiOption() {
+    }
+    return UiOption;
+}());
+var MenuOptionType;
+(function (MenuOptionType) {
+    MenuOptionType[MenuOptionType["Action"] = 1] = "Action";
+    MenuOptionType[MenuOptionType["Url"] = 2] = "Url";
+    MenuOptionType[MenuOptionType["State"] = 3] = "State";
+})(MenuOptionType || (MenuOptionType = {}));
+
 /**
  * Implementación del servicio
  */
@@ -203,46 +238,13 @@ var OfConfigServiceProvider = (function () {
         }
         this.$translateProvider.preferredLanguage(languageConfig.lang);
     };
+    /**
+     * Inyección de dependencias del proveedor
+     */
+    OfConfigServiceProvider.$inject = ["$translateProvider"];
     return OfConfigServiceProvider;
 }());
-/**
- * Inyección de dependencias del proveedor
- */
-OfConfigServiceProvider.$inject = ["$translateProvider"];
 
-
-var LanguageConfig = (function () {
-    function LanguageConfig() {
-        this.localizationPrefix = "localization/";
-        this.localizationSuffix = ".json";
-        this.storageKey = "language";
-        this.lang = undefined;
-    }
-    return LanguageConfig;
-}());
-
-var StatesConfig = (function () {
-    function StatesConfig() {
-    }
-    return StatesConfig;
-}());
-var SettingsConfig = (function () {
-    function SettingsConfig() {
-    }
-    return SettingsConfig;
-}());
-
-var UiOption = (function () {
-    function UiOption() {
-    }
-    return UiOption;
-}());
-var MenuOptionType;
-(function (MenuOptionType) {
-    MenuOptionType[MenuOptionType["Action"] = 1] = "Action";
-    MenuOptionType[MenuOptionType["Url"] = 2] = "Url";
-    MenuOptionType[MenuOptionType["State"] = 3] = "State";
-})(MenuOptionType || (MenuOptionType = {}));
 
 /**
  * Servicio base para acceso HTTP.
@@ -289,13 +291,12 @@ var OfHttpService = (function () {
         });
         return res;
     };
+    /**
+     * Inyección de las dependencias por nombre real declarado en angular.
+     */
+    OfHttpService.$inject = ["$http", "$httpParamSerializer", "$log", "Settings"];
     return OfHttpService;
 }());
-/**
- * Inyección de las dependencias por nombre real declarado en angular.
- */
-OfHttpService.$inject = ["$http", "$httpParamSerializer", "$log", "Settings"];
-
 
 /**
  * Clase que abstrae el acceso a localStorage, serializando y
@@ -386,6 +387,9 @@ var ComponentController = (function () {
     function ComponentController() {
         this.ui = {};
     }
+    ComponentController.prototype.$onInit = function () {
+        // nothing here
+    };
     return ComponentController;
 }());
 
@@ -397,9 +401,12 @@ var DefaultController = (function () {
         console.log($state.current);
         console.log($config.settings);
     }
+    DefaultController.prototype.$onInit = function () {
+        // nothing here
+    };
+    DefaultController.$inject = ["$scope", "$state", "OfConfigService"];
     return DefaultController;
 }());
-DefaultController.$inject = ["$scope", "$state", "OfConfigService"];
 
 /// <reference types="angular" />
 /// <reference types="angular-translate" />

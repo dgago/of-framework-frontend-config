@@ -115,7 +115,7 @@ class OfConfigService implements IOfConfigService {
   /**
    * Carga los estados de la app
    */
-  public loadStates(): ng.IHttpPromise<ng.ui.IState[]> {
+  public loadStates(): ng.IHttpPromise<any> {
     this.$log.debug(this.MODULE + " - cargando estados");
 
     if (!this.statesConfig || !this.statesConfig.endpoint) {

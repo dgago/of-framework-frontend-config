@@ -1,3 +1,46 @@
+interface IKeyValue {
+    id: string;
+    value: any;
+}
+
+declare class LanguageConfig {
+    localizationPrefix: string;
+    localizationSuffix: string;
+    storageKey: string;
+    storage: IBrowserStorage;
+    lang: string;
+}
+
+declare type SettingsEndpointCallback = (settings: any) => void;
+declare class SettingsConfig {
+    endpoint: string;
+    observers: SettingsEndpointCallback[];
+}
+
+/// <reference types="angular-ui-router" />
+declare type StatesEndpointCallback = (states: ng.ui.IState[]) => void;
+declare class StatesConfig {
+    endpoint: string;
+    observers: StatesEndpointCallback[];
+}
+
+/// <reference types="angular" />
+/// <reference types="angular-ui-router" />
+declare class UiOption {
+    type: MenuOptionType;
+    icon: string;
+    label: string;
+    tooltip: string;
+    cssClass: string;
+    action: string | ((ev: ng.IAngularEvent, state: ng.ui.IState) => void);
+    auth: any;
+}
+declare enum MenuOptionType {
+    Action = 1,
+    Url = 2,
+    State = 3,
+}
+
 /// <reference types="angular-ui-router" />
 /// <reference types="angular" />
 /// <reference types="angular-translate" />
@@ -53,7 +96,7 @@ declare class OfConfigService implements IOfConfigService {
     /**
      * Carga los estados de la app
      */
-    loadStates(): ng.IHttpPromise<ng.ui.IState[]>;
+    loadStates(): ng.IHttpPromise<any>;
     /**
      * Devuelve el lenguaje que se está utilizando en la aplicación
      */
@@ -126,46 +169,10 @@ declare class OfConfigServiceProvider implements ng.IServiceProvider {
     configureLanguage(languageConfig: LanguageConfig): void;
 }
 
-interface IKeyValue {
-    id: string;
-    value: any;
-}
-
-declare class LanguageConfig {
-    localizationPrefix: string;
-    localizationSuffix: string;
-    storageKey: string;
-    storage: IBrowserStorage;
-    lang: string;
-}
-
-/// <reference types="angular-ui-router" />
-declare type SettingsEndpointCallback = (settings: any) => void;
-declare type StatesEndpointCallback = (states: ng.ui.IState[]) => void;
-declare class StatesConfig {
-    endpoint: string;
-    observers: StatesEndpointCallback[];
-}
-declare class SettingsConfig {
-    endpoint: string;
-    observers: SettingsEndpointCallback[];
-}
-
-/// <reference types="angular" />
-/// <reference types="angular-ui-router" />
-declare class UiOption {
-    type: MenuOptionType;
-    icon: string;
-    label: string;
-    tooltip: string;
-    cssClass: string;
-    action: string | ((ev: ng.IAngularEvent, state: ng.ui.IState) => void);
-    auth: any;
-}
-declare enum MenuOptionType {
-    Action = 1,
-    Url = 2,
-    State = 3,
+interface IBrowserStorage {
+    setItem(key: string, item: any): void;
+    getItem(key: string): any;
+    removeItem(key: string): void;
 }
 
 /// <reference types="angular" />
@@ -203,12 +210,6 @@ declare class OfHttpService<T> {
      * @param data Array de objetos con campos id y value.
      */
     toObject(data: IKeyValue[]): object;
-}
-
-interface IBrowserStorage {
-    setItem(key: string, item: any): void;
-    getItem(key: string): any;
-    removeItem(key: string): void;
 }
 
 /**
@@ -272,6 +273,7 @@ declare class Component implements ng.IComponentOptions {
 }
 declare class ComponentController implements ng.IController {
     protected ui: any;
+    $onInit?(): void;
 }
 
 /// <reference types="angular" />
@@ -282,5 +284,6 @@ declare class DefaultController implements ng.IController {
     protected $config: IOfConfigService;
     static $inject: ReadonlyArray<string>;
     constructor($scope: ng.IScope, $state: ng.ui.IStateService, $config: IOfConfigService);
+    $onInit?(): void;
 }
 

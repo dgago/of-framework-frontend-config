@@ -7,4 +7,8 @@ class Component implements ng.IComponentOptions {
 
 class ComponentController implements ng.IController {
   protected ui: any = {};
+
+  public $onInit?(): void {
+    // nothing here
+  }
 }

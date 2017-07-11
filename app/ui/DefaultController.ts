@@ -5,4 +5,8 @@ class DefaultController implements ng.IController {
     console.log($state.current);
     console.log($config.settings);
   }
+
+  public $onInit?(): void {
+    // nothing here
+  }
 }
